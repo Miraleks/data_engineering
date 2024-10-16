@@ -56,6 +56,28 @@ def read_json_file(file_path):
 
 
 @ensure_directory_exists
+def append_to_json_file(new_data, file_path):
+    if os.path.exists(file_path):
+        with open(file_path, 'r') as f:
+            try:
+                existing_data = json.load(f)
+            except json.JSONDecodeError:
+                existing_data = []
+    else:
+        existing_data = []
+
+    if isinstance(existing_data, list):
+        existing_data.append(new_data)
+    else:
+        if isinstance(existing_data, dict) and isinstance(new_data, dict):
+            existing_data.update(new_data)
+        else:
+            raise ValueError("The JSON file must contain a list or dictionary to add data to.")
+    with open(file_path, 'w') as f:
+        json.dump(existing_data, f, indent=4)
+
+
+@ensure_directory_exists
 def create_csv_file(file_path, data):
     df1 = pd.DataFrame(data)
     df1.to_csv(file_path)
@@ -74,9 +96,11 @@ if __name__ == "__main__":
 
     # create_yaml_file(file_path=yaml_file_path, data=dict_data_for_yaml)
     # print(read_yaml_file(yaml_file_path))
-
+    #
     # create_json_file(json_file_path, dict_for_json)
     # print(read_json_file(json_file_path))
+    #
+    # create_csv_file(csv_file_path, data_for_csv)
+    # print(read_csv_file(csv_file_path))
 
-    create_csv_file(csv_file_path, data_for_csv)
-    print(read_csv_file(csv_file_path))
+    append_json_file(json_file_path, dict_for_json)
