@@ -1,7 +1,6 @@
 import requests
 
 from api_keys import api_key_currencylayer
-from file_processing import create_json_file, append_to_json_file
 
 base_link = "http://api.currencylayer.com/change"
 curr = "USD,EUR"
@@ -17,4 +16,4 @@ r = requests.get(url=URL)
 result = r.json()  # dict
 
 # append_to_json_file(path_to_file, result)
-print(result.get('quotes').get('UAHUSD'))
+print(result.get("quotes").get("UAHUSD"))
