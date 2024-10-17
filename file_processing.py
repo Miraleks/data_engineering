@@ -80,7 +80,7 @@ def append_to_json_file(new_data, file_path):
 @ensure_directory_exists
 def create_csv_file(file_path, data):
     df1 = pd.DataFrame(data)
-    df1.to_csv(file_path)
+    df1.to_csv(file_path, index=False)
 
 
 @ensure_directory_exists
