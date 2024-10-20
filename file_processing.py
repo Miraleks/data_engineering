@@ -4,6 +4,7 @@ import os
 import abc
 from functools import wraps
 import pandas as pd
+from datetime import datetime
 
 
 def ensure_path_exists(func):
@@ -105,17 +106,38 @@ class YAMLHandler(DataHandler):
 
 
 class CSVHandler(DataHandler):
-    def __init__(self, data):
-        super().__init__(data)  # We expected than data it's a DataFrame
+    def __init__(self, date=None, file_path=None, data=None):
+        super().__init__(data)
+        self.date = date if date is not None else datetime.now().strftime("%Y-%m-%d") # начальная дата для формирования имени файла
+        self.file_path = file_path  # переменная для хранения пути к файлу
+        self.data = data if data is not None else pd.DataFrame()  # инициализация DataFrame
 
     @ensure_path_exists
-    def create_file(self, file_path):
+    def create_file(self, file_path, columns):
+        self.data = pd.DataFrame(columns=["Date"] + columns)
         self.data.to_csv(file_path, index=False)
 
-    @ensure_path_exists
-    def add_to_file(self, file_path, new_data):
-        new_df = pd.DataFrame([new_data])
-        new_df.to_csv(file_path, mode="a", header=False, index=False)
+    # @ensure_path_exists
+    def add_to_file(self, file_path=None, new_data=None):
+        current_date = new_data.get('date', None)
+
+        if self.file_path is None:
+            keys = list(new_data['quotes'].keys()) if new_data.get('quotes') else []
+            keys_part = "_".join(keys) if keys else "NoData"
+            self.file_path = os.path.join('data', f"{self.date}_{keys_part}.csv")
+            self.create_file(self.file_path, keys)
+
+        new_row = {"Data": current_date}
+        if new_data.get('quotes') is None:
+            keys = self.data.columns[1:]
+            for key in keys:
+                new_row[key] = None
+        else:
+            for key, value in new_data['quotes'].items():
+                new_row[key] = value
+
+        new_df = pd.DataFrame([new_row])
+        new_df.to_csv(self.file_path, mode='a', header=False, index=False)
 
     def read_file(self, file_path):
         df = pd.read_csv(file_path)
