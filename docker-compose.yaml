@@ -1,0 +1,30 @@
+services:
+  ubuntu:
+    image: ubuntu:latest
+    container_name: ubuntu_container
+    command: ["sleep", "infinity"]
+    volumes:
+      - ./data:/app
+    networks:
+      - my_network
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydatabase
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - my_network
+
+volumes:
+  postgres_data:
+
+networks:
+  my_network:
+    driver: bridge
