@@ -33,5 +33,3 @@ while current_date <= end:
 
     current_date += timedelta(days=1)
     time.sleep(1)  # used to avoid blocking by the API
-
-
